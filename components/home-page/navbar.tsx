@@ -8,10 +8,22 @@ import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,8 +31,75 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
+    // Check if user is signed in using Supabase
+    const checkAuthStatus = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        setIsSignedIn(true);
+
+        // Get user's email or name for the avatar
+        // First, try to get user metadata if available
+        if (
+          user.user_metadata &&
+          (user.user_metadata.full_name || user.user_metadata.name)
+        ) {
+          setUsername(user.user_metadata.full_name || user.user_metadata.name);
+        } else if (user.email) {
+          // Fall back to email if no name is available
+          setUsername(user.email.split("@")[0]);
+        } else {
+          // Last resort
+          setUsername("User");
+        }
+      }
+    };
+
+    checkAuthStatus();
+
+    // Set up auth state change listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        setIsSignedIn(true);
+        const user = session.user;
+
+        if (
+          user.user_metadata &&
+          (user.user_metadata.full_name || user.user_metadata.name)
+        ) {
+          setUsername(user.user_metadata.full_name || user.user_metadata.name);
+        } else if (user.email) {
+          setUsername(user.email.split("@")[0]);
+        } else {
+          setUsername("User");
+        }
+      }
+
+      if (event === "SIGNED_OUT") {
+        setIsSignedIn(false);
+        setUsername("");
+      }
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (!error) {
+      setIsSignedIn(false);
+      router.push("/");
+    }
+  };
 
   const scrollToPricing = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -53,38 +132,90 @@ export default function Navbar() {
         <nav className="hidden md:flex gap-6 items-center">
           <Link
             href="/dashboard"
-            className="text-sm font-medium hover:text-primary transition-colors"
+            className="text-base font-medium hover:text-primary transition-colors"
           >
             Dashboard
           </Link>
           <Link
             href="#pricing"
             onClick={scrollToPricing}
-            className="text-sm font-medium hover:text-primary transition-colors"
+            className="text-base font-medium hover:text-primary transition-colors"
           >
             Pricing
-          </Link>
-          <Link
-            href="/settings"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Settings
           </Link>
         </nav>
         <div className="hidden md:flex gap-4 items-center">
           <ThemeSwitcher />
-          <Link
-            href="/sign-in"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Sign In
-          </Link>
-          <Button asChild>
-            <Link href="/sign-up">Sign Up</Link>
-          </Button>
+
+          {isSignedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-full bg-primary text-primary-foreground font-medium"
+                >
+                  {username.charAt(0).toUpperCase()}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-red-500 hover:text-red-600 focus:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                >
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                Sign In
+              </Link>
+              <Button asChild>
+                <Link href="/sign-up">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
         <div className="md:hidden flex items-center gap-2">
           <ThemeSwitcher />
+          {isSignedIn && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-primary text-primary-foreground font-medium mr-1"
+                >
+                  {username.charAt(0).toUpperCase()}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-red-500 hover:text-red-600 focus:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                >
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -104,7 +235,7 @@ export default function Navbar() {
           <div className="container px-4 py-4 flex flex-col gap-4">
             <Link
               href="/dashboard"
-              className="flex items-center py-2 hover:text-primary transition-colors"
+              className="flex items-center py-2 text-base hover:text-primary transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Dashboard
@@ -112,34 +243,29 @@ export default function Navbar() {
             <Link
               href="#pricing"
               onClick={scrollToPricing}
-              className="flex items-center py-2 hover:text-primary transition-colors"
+              className="flex items-center py-2 text-base hover:text-primary transition-colors"
             >
               Pricing
             </Link>
-            <Link
-              href="/settings"
-              className="flex items-center py-2 hover:text-primary transition-colors"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Settings
-            </Link>
-            <div className="border-t border-border pt-4 mt-2 flex flex-col gap-2">
-              <Link
-                href="/sign-in"
-                className="flex items-center py-2 hover:text-primary transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <Button asChild>
+            {!isSignedIn && (
+              <div className="border-t border-border pt-4 mt-2 flex flex-col gap-2">
                 <Link
-                  href="/sign-up"
+                  href="/sign-in"
+                  className="flex items-center py-2 hover:text-primary transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Sign Up
+                  Sign In
                 </Link>
-              </Button>
-            </div>
+                <Button asChild>
+                  <Link
+                    href="/sign-up"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
