@@ -1,10 +1,5 @@
-import DeployButton from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import Link from "next/link";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -36,12 +31,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="min-h-screen">
-            {children}
-            <div className="fixed bottom-4 right-4">
-              <ThemeSwitcher />
-            </div>
-          </main>
+          <main className="min-h-screen">{children}</main>
         </ThemeProvider>
       </body>
     </html>

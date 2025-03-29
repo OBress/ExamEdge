@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -71,6 +72,7 @@ export default function Navbar() {
           </Link>
         </nav>
         <div className="hidden md:flex gap-4 items-center">
+          <ThemeSwitcher />
           <Link
             href="/sign-in"
             className="text-sm font-medium hover:text-primary transition-colors"
@@ -81,19 +83,21 @@ export default function Navbar() {
             <Link href="/sign-up">Sign Up</Link>
           </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-          <span className="sr-only">Toggle menu</span>
-        </Button>
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeSwitcher />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </div>
       </div>
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-x-0 top-16 z-50 bg-background border-b border-border animate-in slide-in-from-top-5">

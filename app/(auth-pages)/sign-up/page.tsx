@@ -42,8 +42,8 @@ export default async function SignUpPage(props: {
           <span className="text-xl font-bold text-primary">ExamEdge</span>
         </Link>
       </div>
-      <div className="flex flex-1 items-center justify-center">
-        <div className="mx-auto grid w-full max-w-md gap-6 px-4 md:px-6">
+      <div className="flex flex-1 items-center justify-center w-full">
+        <div className="mx-auto w-full max-w-md gap-6 px-4 md:px-6">
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-bold">Create an Account</h1>
             <p className="text-muted-foreground">
