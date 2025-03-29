@@ -7,8 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import HeaderAuth from "@/components/header-auth";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -71,8 +69,6 @@ export default function Navbar() {
           >
             Settings
           </Link>
-          <HeaderAuth />
-          <ThemeSwitcher />
         </nav>
         <div className="hidden md:flex gap-4 items-center">
           <Link
