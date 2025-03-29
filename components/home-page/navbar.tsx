@@ -72,13 +72,13 @@ export default function Navbar() {
         </nav>
         <div className="hidden md:flex gap-4 items-center">
           <Link
-            href="/signin"
+            href="/sign-in"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             Sign In
           </Link>
           <Button asChild>
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/sign-up">Sign Up</Link>
           </Button>
         </div>
         <Button
@@ -121,14 +121,17 @@ export default function Navbar() {
             </Link>
             <div className="border-t border-border pt-4 mt-2 flex flex-col gap-2">
               <Link
-                href="/signin"
+                href="/sign-in"
                 className="flex items-center py-2 hover:text-primary transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Sign In
               </Link>
               <Button asChild>
-                <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link
+                  href="/sign-up"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   Sign Up
                 </Link>
               </Button>
