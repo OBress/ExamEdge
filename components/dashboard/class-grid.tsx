@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CreateClassDialog } from "@/components/dashboard/create-class-dialog";
+import { CreateClassDialog } from "@/components/dashboard/create-class";
 import { getClasses } from "@/lib/data";
 
 export default function ClassGrid() {

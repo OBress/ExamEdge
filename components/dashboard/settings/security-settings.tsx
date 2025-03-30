@@ -49,11 +49,25 @@ const securityFormSchema = z.object({
   loginNotifications: z.boolean().default(true),
 });
 
+const emailFormSchema = z.object({
+  currentEmail: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  newEmail: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(1, {
+    message: "Password is required to confirm this change.",
+  }),
+});
+
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 type SecurityFormValues = z.infer<typeof securityFormSchema>;
+type EmailFormValues = z.infer<typeof emailFormSchema>;
 
 export default function SecuritySettings() {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isSecurityLoading, setIsSecurityLoading] = useState(false);
 
   const passwordForm = useForm<PasswordFormValues>({
@@ -71,6 +85,15 @@ export default function SecuritySettings() {
       twoFactorAuth: false,
       sessionTimeout: false,
       loginNotifications: true,
+    },
+  });
+
+  const emailForm = useForm<EmailFormValues>({
+    resolver: zodResolver(emailFormSchema),
+    defaultValues: {
+      currentEmail: "",
+      newEmail: "",
+      password: "",
     },
   });
 
@@ -121,6 +144,35 @@ export default function SecuritySettings() {
       });
     } finally {
       setIsSecurityLoading(false);
+    }
+  }
+
+  async function onEmailSubmit(data: EmailFormValues) {
+    setIsEmailLoading(true);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      toast({
+        title: "Email updated",
+        description:
+          "Your email has been updated successfully. Please verify your new email address.",
+      });
+
+      emailForm.reset({
+        currentEmail: "",
+        newEmail: "",
+        password: "",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsEmailLoading(false);
     }
   }
 
@@ -200,140 +252,79 @@ export default function SecuritySettings() {
         </form>
       </Form>
 
-      <Form {...securityForm}>
-        <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)}>
+      <Form {...emailForm}>
+        <form onSubmit={emailForm.handleSubmit(onEmailSubmit)}>
           <Card>
             <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
+              <CardTitle>Change Email Address</CardTitle>
               <CardDescription>
-                Manage your account security preferences.
+                Update your email address. You'll need to verify your new email.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
-                control={securityForm.control}
-                name="twoFactorAuth"
+                control={emailForm.control}
+                name="currentEmail"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Two-Factor Authentication
-                      </FormLabel>
-                      <FormDescription>
-                        Add an extra layer of security to your account.
-                      </FormDescription>
-                    </div>
+                  <FormItem>
+                    <FormLabel>Current Email</FormLabel>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        {...field}
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
-                control={securityForm.control}
-                name="sessionTimeout"
+                control={emailForm.control}
+                name="newEmail"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Session Timeout
-                      </FormLabel>
-                      <FormDescription>
-                        Automatically log out after 30 minutes of inactivity.
-                      </FormDescription>
-                    </div>
+                  <FormItem>
+                    <FormLabel>New Email</FormLabel>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <Input
+                        type="email"
+                        placeholder="newemail@example.com"
+                        {...field}
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
-                control={securityForm.control}
-                name="loginNotifications"
+                control={emailForm.control}
+                name="password"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Login Notifications
-                      </FormLabel>
-                      <FormDescription>
-                        Receive email notifications for new login attempts.
-                      </FormDescription>
-                    </div>
+                  <FormItem>
+                    <FormLabel>Confirm with Password</FormLabel>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
                       />
                     </FormControl>
+                    <FormDescription>
+                      Enter your current password to confirm this change.
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </CardContent>
             <CardFooter className="flex justify-end">
-              <Button type="submit" disabled={isSecurityLoading}>
-                {isSecurityLoading ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={isEmailLoading}>
+                {isEmailLoading ? "Updating..." : "Update Email"}
               </Button>
             </CardFooter>
           </Card>
         </form>
       </Form>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Sessions</CardTitle>
-          <CardDescription>
-            Manage devices that are currently logged into your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="rounded-lg border p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-medium">Current Session</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Chrome on Windows • State College, PA
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Started March 29, 2025 • IP: 192.168.1.1
-                  </p>
-                </div>
-                <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  Active
-                </div>
-              </div>
-            </div>
-            <div className="rounded-lg border p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-medium">Mobile App</h3>
-                  <p className="text-sm text-muted-foreground">
-                    iPhone 15 • State College, PA
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Started March 28, 2025 • IP: 192.168.1.2
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-destructive"
-                >
-                  Revoke
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

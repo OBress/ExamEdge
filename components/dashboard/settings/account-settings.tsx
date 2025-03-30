@@ -165,46 +165,6 @@ export default function AccountSettings() {
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="autoSave"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Auto-save</FormLabel>
-                    <FormDescription>
-                      Automatically save your work as you make changes.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dataSharing"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Data Sharing</FormLabel>
-                    <FormDescription>
-                      Share anonymous usage data to help us improve ExamEdge.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
           </CardContent>
           <CardFooter className="flex justify-end">
             <Button type="submit" disabled={isLoading}>

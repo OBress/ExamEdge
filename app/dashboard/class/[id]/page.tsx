@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import DashboardHeader from "@/components/dashboard/dashboard-header";
+import { DashboardShell } from "@/components/dashboard/shell";
+import DashboardHeader from "@/components/dashboard/header";
 import UnitList from "@/components/dashboard/unit-list";
 import { getClassById } from "@/lib/data";
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import DashboardHeader from "@/components/dashboard/dashboard-header";
+import DashboardHeader from "@/components/dashboard/header";
 import ClassGrid from "@/components/dashboard/class-grid";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardShell } from "@/components/dashboard/shell";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 

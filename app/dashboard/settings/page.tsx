@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import DashboardHeader from "@/components/dashboard/dashboard-header";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import DashboardHeader from "@/components/dashboard/header";
+import { DashboardShell } from "@/components/dashboard/shell";
 import SettingsTabs from "@/components/dashboard/settings/settings-tabs";
 
 export const metadata: Metadata = {
